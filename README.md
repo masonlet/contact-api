@@ -2,12 +2,13 @@
 Deployable Resend contact form API
 
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Node](https://img.shields.io/badge/Node.js-18+-green)
+![Node](https://img.shields.io/badge/Node.js-20+-green)
 
 ## Features
 - Single `POST /api/contact` endpoint - drop into any project.
 - CORS support via `ALLOWED_ORIGINS` env var.
 - Input validation with descriptive error responses.
+- Rate limiting via Vercel WAF to prevent spam and abuse.
 
 ## Usage
 ```js
@@ -28,12 +29,13 @@ await fetch('https://your-deployment.vercel.app/api/contact', {
 | 200    | { success: true, message: "Message sent successfully" } |
 | 400    | { error: "All fields are required" } |
 | 405    | { error: "Method not allowed" } |
+| 429    | { error: "Too many requests. Please try again later." } |
 | 500    | { error: "Failed to send message" } |
 
 ## Deployment & Configuration
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20+
 - Resend API key
 - Vercel
 
