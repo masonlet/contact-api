@@ -1,0 +1,18 @@
+{
+  "name": "contact-api",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Deployable contact form API",
+  "author": "Mason L'Etoile",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vercel/node": "^5.6.15",
+    "resend": "^6.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}
