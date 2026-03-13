@@ -8,13 +8,20 @@ const ALLOWED_ORIGINS = (process.env["ALLOWED_ORIGINS"] ?? "")
 .map(o => o.trim())
 .filter(Boolean);
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function isValidBody(body: unknown): body is ContactBody {
   if (body === null || typeof body !== "object") return false;
   const record = body as Record<string, unknown>;
+  
+  const subject = record["subject"];
+  const email = record["email"];
+  const message = record["message"];
+
   return (
-    typeof record["subject"] === "string" && !!record["subject"].trim() &&
-    typeof record["email"] === "string" && !!record["email"].trim() &&
-    typeof record["message"] === "string" && !!record["message"].trim()
+    typeof subject === "string" && !!subject.trim() && subject.length <= 200 &&
+    typeof email === "string" && EMAIL_REGEX.test(email) &&
+    typeof message === "string" && !!message.trim() && message.length <= 2000
   );
 }
 
@@ -47,7 +54,7 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
   }
 
   if (!isValidBody(req.body)) {
-    res.status(400).json({ error: "All fields are required" });
+    res.status(400).json({ error: "Invalid or missing fields" });
     return;
   }
 
