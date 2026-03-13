@@ -27,7 +27,7 @@ await fetch('https://your-deployment.vercel.app/api/contact', {
 | Status | Body |
 | ------ | ---- |
 | 200    | { success: true, message: "Message sent successfully" } |
-| 400    | { error: "All fields are required" } |
+| 400    | { error: "Invalid or missing fields" } |
 | 405    | { error: "Method not allowed" } |
 | 429    | { error: "Too many requests. Please try again later." } |
 | 500    | { error: "Failed to send message" } |
