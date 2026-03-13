@@ -63,6 +63,11 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
+  if(req.body["_h"]) {
+    res.json({ success: true, message: "Message sent successfully" });
+    return;
+  }
+
   if (!isValidBody(req.body)) {
     res.status(400).json({ error: "Invalid or missing fields" });
     return;
