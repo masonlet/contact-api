@@ -2,11 +2,16 @@ import { Resend } from "resend";
 import { checkRateLimit } from "@vercel/firewall"
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import type { ContactBody } from "./types.js";
+ 
+const apiKey = process.env["RESEND_API_KEY"];
+const fromEmail = process.env["FROM_EMAIL"];
+const toEmail = process.env["TO_EMAIL"];
+const resend = apiKey ? new Resend(apiKey) : null;
 
 const ALLOWED_ORIGINS = (process.env["ALLOWED_ORIGINS"] ?? "")
-.split(',')
-.map(o => o.trim())
-.filter(Boolean);
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -53,21 +58,17 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
+  if (!resend || !fromEmail || !toEmail) {
+    res.status(500).json({ error: "Server misconfiguration" });
+    return;
+  }
+
   if (!isValidBody(req.body)) {
     res.status(400).json({ error: "Invalid or missing fields" });
     return;
   }
 
   const { subject, email, message } = req.body;
-  const apiKey = process.env["RESEND_API_KEY"];
-  const fromEmail = process.env["FROM_EMAIL"];
-  const toEmail = process.env["TO_EMAIL"];
-  if (!apiKey || !fromEmail || !toEmail) {
-    res.status(500).json({ error: "Server misconfiguration" });
-    return;
-  }
-
-  const resend = new Resend(apiKey);
   try {
     await resend.emails.send({
       from: fromEmail,
