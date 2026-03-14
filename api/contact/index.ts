@@ -45,13 +45,13 @@ export function setCorsHeaders(req: VercelRequest, res: VercelResponse): boolean
 }
 
 export default async (req: VercelRequest, res: VercelResponse): Promise<void> => {
+  if (setCorsHeaders(req, res)) return;
+
   const { rateLimited } = await checkRateLimit("contact-form-limit", { request: req });
   if (rateLimited) {
     res.status(429).json({ error: "Too many requests. Please try again later." });
     return;
   }
-
-  if (setCorsHeaders(req, res)) return;
 
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
@@ -63,7 +63,7 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
-  if(req.body["_h"]) {
+  if(req.body["fax_number"]) {
     res.json({ success: true, message: "Message sent successfully" });
     return;
   }
