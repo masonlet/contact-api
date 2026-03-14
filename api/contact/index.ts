@@ -58,6 +58,11 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
+  if (!req.headers["content-type"]?.startsWith("application/json")) {
+    res.status(415).json({ error: "Unsupported Media Type" });
+    return;
+  }
+
   if (!resend || !fromEmail || !toEmail) {
     res.status(500).json({ error: "Server misconfiguration" });
     return;
