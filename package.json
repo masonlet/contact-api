@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@vercel/firewall": "^1.1.2",
     "@vercel/node": "^5.6.15",
     "resend": "^6.9.3"
   },
