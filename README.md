@@ -29,6 +29,7 @@ await fetch('https://your-deployment.vercel.app/api/contact', {
 | ------ | ---- |
 | 200    | { success: true, message: "Message sent successfully" } |
 | 400    | { error: "Invalid or missing fields" } |
+| 403    | { error: "Forbidden" } |
 | 405    | { error: "Method not allowed" } |
 | 415    | { error: "Unsupported Media Type" } |
 | 429    | { error: "Too many requests. Please try again later." } |
@@ -57,7 +58,7 @@ Fill in `.env` using `.env.example`
 | `RESEND_API_KEY`  | Your Resend API key |
 | `FROM_EMAIL`      | Sender address (must be a verified Resend domain) |
 | `TO_EMAIL`        | Where contact form submissions are delivered |
-| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins, **Required** — empty blocks all requests. |
 
 ### 3. Deploy
 ```bash
