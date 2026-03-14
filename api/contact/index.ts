@@ -31,6 +31,7 @@ export function isValidBody(body: unknown): body is ContactBody {
 }
 
 export function setCorsHeaders(req: VercelRequest, res: VercelResponse): boolean {
+  res.setHeader("X-Content-Type-Options", "nosniff");
   const origin = req.headers["origin"];
   if (origin !== undefined && ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -69,6 +70,7 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
   }
 
   if(req.body["fax_number"]) {
+    console.warn("Honeypot triggered:", req.headers["x-forwarded-for"] ?? "unknown");
     res.json({ success: true, message: "Message sent successfully" });
     return;
   }

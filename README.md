@@ -9,6 +9,7 @@ Deployable Resend contact form API
 - CORS support via `ALLOWED_ORIGINS` env var.
 - Input validation with descriptive error responses.
 - Rate limiting via Vercel WAF to prevent spam and abuse.
+- Honeypot protection
 
 ## Usage
 ```js
