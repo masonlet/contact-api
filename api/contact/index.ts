@@ -78,8 +78,9 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     await resend.emails.send({
       from: fromEmail,
       to: toEmail,
-      subject: `Contact form: ${subject}`,
-      text: `From: ${email}\n\n${message}`
+      replyTo: email,
+      subject: `Contact form: ${subject.replace(/[\r\n]+/g, " ").trim()}`,
+      text: `From: ${email}\n\n${message.trim()}`
     });
     res.json({ success: true, message: "Message sent successfully" });
   } catch (error) {
