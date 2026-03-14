@@ -47,7 +47,7 @@ export function setCorsHeaders(req: VercelRequest, res: VercelResponse): boolean
 export default async (req: VercelRequest, res: VercelResponse): Promise<void> => {
   if (setCorsHeaders(req, res)) return;
 
-  const { rateLimited } = await checkRateLimit("contact-form-limit", { request: req });
+  const { rateLimited } = await checkRateLimit("contact-form-limit");
   if (rateLimited) {
     res.status(429).json({ error: "Too many requests. Please try again later." });
     return;
