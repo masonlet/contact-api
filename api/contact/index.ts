@@ -1,52 +1,17 @@
-import { Resend } from "resend";
-import { checkRateLimit } from "@vercel/firewall"
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import type { ContactBody } from "./types.js";
- 
-const apiKey = process.env["RESEND_API_KEY"];
-const fromEmail = process.env["FROM_EMAIL"];
-const toEmail = process.env["TO_EMAIL"];
-const resend = apiKey ? new Resend(apiKey) : null;
-
-const ALLOWED_ORIGINS = (process.env["ALLOWED_ORIGINS"] ?? "")
-  .split(',')
-  .map(o => o.trim())
-  .filter(Boolean);
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export function isValidBody(body: unknown): body is ContactBody {
-  if (body === null || typeof body !== "object") return false;
-  const record = body as Record<string, unknown>;
-  
-  const subject = record["subject"];
-  const email = record["email"];
-  const message = record["message"];
-
-  return (
-    typeof subject === "string" && !!subject.trim() && subject.length <= 200 &&
-    typeof email === "string" && EMAIL_REGEX.test(email) &&
-    typeof message === "string" && !!message.trim() && message.length <= 2000
-  );
-}
-
-export function setCorsHeaders(req: VercelRequest, res: VercelResponse): boolean {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  const origin = req.headers["origin"];
-  if (origin !== undefined && ALLOWED_ORIGINS.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  }
-  if (req.method === "OPTIONS") {
-    res.status(204).end();
-    return true;
-  }
-  return false;
-}
+import { checkRateLimit } from "@vercel/firewall"
+import { setCorsHeaders, isOriginAllowed } from "./cors.js";
+import { isValidBody } from "./validation.js";
+import { getEmailConfig, sendEmail } from "./email.js";
+import { config } from "./config.js";
 
 export default async (req: VercelRequest, res: VercelResponse): Promise<void> => {
-  if (setCorsHeaders(req, res)) return;
+  if (setCorsHeaders(req, res, config.allowedOrigins)) return;
+
+  if (!isOriginAllowed(req.headers["origin"], config.allowedOrigins)) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
 
   const { rateLimited } = await checkRateLimit("contact-form-limit");
   if (rateLimited) {
@@ -64,8 +29,9 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
-  if (!resend || !fromEmail || !toEmail) {
-    res.status(500).json({ error: "Server misconfiguration" });
+  const emailConfig = getEmailConfig(config);
+  if (!emailConfig) {
+    res.status(503).json({ error: "Service temporarily unavailable" });
     return;
   }
 
@@ -80,18 +46,11 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
-  const { subject, email, message } = req.body;
   try {
-    await resend.emails.send({
-      from: fromEmail,
-      to: toEmail,
-      replyTo: email,
-      subject: `Contact form: ${subject.replace(/[\r\n]+/g, " ").trim()}`,
-      text: `From: ${email}\n\n${message.trim()}`
-    });
+    await sendEmail(emailConfig, req.body);
     res.json({ success: true, message: "Message sent successfully" });
   } catch (error) {
     console.error("Email error:", error);
-    res.status(500).json({ error: "Failed to send message" });
+    res.status(500).json({ error: "Message delivery failed. Please try again later." });
   }
 };
