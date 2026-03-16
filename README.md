@@ -5,6 +5,13 @@ Deployable Resend contact form API
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Node](https://img.shields.io/badge/Node.js-20+-green)
 
+## Table of Contents
+- [Features](#features)
+- [Usage](#usage)
+- [Response](#response)
+- [Deployment & Configuration](#deployment--configuration)
+- [License](#license)
+
 ## Features
 - Single `POST /api/contact` endpoint - drop into any project.
 - CORS support via `ALLOWED_ORIGINS` env var.
