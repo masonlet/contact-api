@@ -1,6 +1,7 @@
 # Contact API
 Deployable Resend contact form API
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=RESEND_API_KEY,FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS&envDescription[RESEND_API_KEY]=Your%20Resend%20API%20key&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Node](https://img.shields.io/badge/Node.js-20+-green)
 
