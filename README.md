@@ -40,30 +40,37 @@ await fetch('https://your-deployment.vercel.app/api/contact', {
 
 ### Prerequisites
 - Node.js 20+
-- Resend API key
+- Resend API key & verified domain
 - Vercel
 
-### 1. Clone the Repository
+### 1. Clone & Install
 ```bash
 git clone https://github.com/masonlet/contact-api.git
 cd contact-api
 npm install
 ```
 
-### 2. Configure Environment
-Fill in `.env` using `.env.example`
+### 2. Configure `.env`
+Copy `.env.example` to `.env` and fill Environment Variables. All values are **required**.
 
-#### Environment Variables
 | Variable          | Description |
 | ----------------- | ----------- |
 | `RESEND_API_KEY`  | Your Resend API key |
 | `FROM_EMAIL`      | Sender address (must be a verified Resend domain) |
-| `TO_EMAIL`        | Where contact form submissions are delivered |
-| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins, **Required** — empty blocks all requests. |
+| `TO_EMAIL`        | Delivery address |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins, empty blocks all requests. |
 
-### 3. Deploy
+### Deploy
 ```bash
 vercel deploy
+```
+
+### Local Development
+```bash
+npm run typecheck     # TypeScript type check
+npm run test          # Vitest check
+npm run test:watch    # Vitest watch mode
+npm run test:coverage # Vitest coverage mode
 ```
 
 ## License
