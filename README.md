@@ -4,12 +4,20 @@ Deployable Resend contact form API
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Node](https://img.shields.io/badge/Node.js-20+-green)
 
+## Table of Contents
+- [Features](#features)
+- [Usage](#usage)
+- [Response](#response)
+- [Deployment & Configuration](#deployment--configuration)
+- [License](#license)
+
 ## Features
 - Single `POST /api/contact` endpoint - drop into any project.
 - CORS support via `ALLOWED_ORIGINS` env var.
 - Input validation with descriptive error responses.
 - Rate limiting via Vercel WAF to prevent spam and abuse.
 - Honeypot protection
+> **Note:** To utilize the honeypot, ensure your frontend includes a hidden input field named `[fax_number]` that remains empty during submission.
 
 ## Usage
 ```js
@@ -58,9 +66,12 @@ Copy `.env.example` to `.env` and fill Environment Variables. All values are **r
 | `RESEND_API_KEY`  | Your Resend API key |
 | `FROM_EMAIL`      | Sender address (must be a verified Resend domain) |
 | `TO_EMAIL`        | Delivery address |
-| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins, empty blocks all requests. |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins— empty blocks all requests. |
 
 ### Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=RESEND_API_KEY,FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS&envDescription[RESEND_API_KEY]=Your%20Resend%20API%20key&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins)
+
 ```bash
 vercel deploy
 ```
