@@ -77,12 +77,12 @@ describe("contact handler (index.ts)", () => {
     expect(res.status).toHaveBeenCalledWith(415);
   });
 
-  it("returns 500 when email is misconfigured", async () => {
+  it("returns 503 when server is misconfigured", async () => {
     vi.mocked(getEmailConfig).mockReturnValue(null);
     const res = makeRes();
     await handler(makeReq(), res);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Server misconfiguration" });
+    expect(res.status).toHaveBeenCalledWith(503);
+    expect(res.json).toHaveBeenCalledWith({ error: "Service temporarily unavailable" });
   });
 
   it("returns fake success and does not send email when honeypot is triggered", async () => {
@@ -116,7 +116,7 @@ describe("contact handler (index.ts)", () => {
     const res = makeRes();
     await handler(makeReq(), res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: "Failed to send message" });
+    expect(res.json).toHaveBeenCalledWith({ error: "Message delivery failed. Please try again later." });
     errorSpy.mockRestore();
   });
 });

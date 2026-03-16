@@ -33,7 +33,8 @@ await fetch('https://your-deployment.vercel.app/api/contact', {
 | 405    | { error: "Method not allowed" } |
 | 415    | { error: "Unsupported Media Type" } |
 | 429    | { error: "Too many requests. Please try again later." } |
-| 500    | { error: "Failed to send message" } |
+| 500    | { error: "Message delivery failed. Please try again." } |
+| 503    | { error: "Service temporarily unavailable" } |
 
 ## Deployment & Configuration
 

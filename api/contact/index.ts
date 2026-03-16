@@ -31,7 +31,7 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
 
   const emailConfig = getEmailConfig(config);
   if (!emailConfig) {
-    res.status(500).json({ error: "Server misconfiguration" });
+    res.status(503).json({ error: "Service temporarily unavailable" });
     return;
   }
 
@@ -51,6 +51,6 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     res.json({ success: true, message: "Message sent successfully" });
   } catch (error) {
     console.error("Email error:", error);
-    res.status(500).json({ error: "Failed to send message" });
+    res.status(500).json({ error: "Message delivery failed. Please try again later." });
   }
 };
