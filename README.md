@@ -1,6 +1,7 @@
 # Contact API
 Deployable Resend contact form API
 
+[![Tests](https://github.com/masonlet/contact-api/actions/workflows/ci.yml/badge.svg)](https://github.com/masonlet/contact-api/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Node](https://img.shields.io/badge/Node.js-20+-green)
 
