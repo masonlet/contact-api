@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { EMAIL_REGEX, isValidBody } from "../../api/contact/validation.js";
+import { EMAIL_REGEX, isValidBody } from "@/api/contact/validation.js";
 
 describe("EMAIL_REGEX", () => {
   const validate = (email: string) => EMAIL_REGEX.test(email);
