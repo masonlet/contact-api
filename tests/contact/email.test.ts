@@ -1,7 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import type { Resend } from "resend";
 import { getEmailConfig, sendEmail, type EmailConfig } from "@/api/contact/email.js";
-import type { Config } from "@/api/contact/config.js";
 import type { ContactBody } from "@/api/contact/types.js";
 
 vi.mock("resend");
@@ -56,6 +55,24 @@ describe("email.ts", () => {
         subject: "Contact form: Test Subject",
         text: `From: ${body.email}\n\n${body.message.trim()}`
       });
+    });
+
+    it("formats fromLine with name when provided", async () => {
+      const bodyWithName: ContactBody = { ...body, name: "Tester" };
+      await sendEmail(mockEmailConfig, bodyWithName);
+      expect(mockResend.emails.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: `From: Tester <user@test.com>\n\n${body.message.trim()}`
+        })
+      );
+    });
+
+    it("uses default subject when not provided", async () => {
+      const bodyNoSubject: ContactBody = { email: "user@test.com", message: "Hello" };
+      await sendEmail(mockEmailConfig, bodyNoSubject);
+      expect(mockResend.emails.send).toHaveBeenCalledWith(
+        expect.objectContaining({ subject: "Contact form: New message" })
+      );
     });
 
     it("throws Resend errors", async () => {

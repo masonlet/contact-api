@@ -1,7 +1,7 @@
 {
   "name": "contact-api",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Deployable contact form API",
   "author": "Mason L'Etoile",
   "license": "MIT",

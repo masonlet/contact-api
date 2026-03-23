@@ -51,13 +51,17 @@ describe("EMAIL_REGEX", () => {
 });
 
 describe("isValidBody",() => {
-  it("should accept a valid body", () => {
-    const valid = {
-      subject: "Hello",
+  it("should accept a valid body with all fields", () => {
+    expect(isValidBody({
       email: "test@example.com",
-      message: "Valid test message."
-    };
-    expect(isValidBody(valid)).toBe(true);
+      message: "Valid test message.",
+      subject: "Hello",
+      name: "Test"
+    })).toBe(true);
+  });
+
+  it("should accept a valid body with only required fields", () => {
+    expect(isValidBody({ email: "test@example.com", message: "hello" })).toBe(true);
   });
 
   it("should reject non-objects", () => {
@@ -66,25 +70,29 @@ describe("isValidBody",() => {
     });
   });
 
-  it("should reject missing fields", () => {
+  it("should reject missing required fields", () => {
     expect(isValidBody({})).toBe(false);
-    expect(isValidBody({ subject: "Hello", email: "user@example.com" })).toBe(false);
+    expect(isValidBody({ email: "user@example.com" })).toBe(false);
+    expect(isValidBody({ message: "hello" })).toBe(false);
   });
 
   it("should reject non-string field types", () => {
-    expect(isValidBody({ subject: 123, email: "user@example.com", message: "hello" })).toBe(false);
-    expect(isValidBody({ subject: "hi", email: 123, message: "hello" })).toBe(false);
-    expect(isValidBody({ subject: "hi", email: "user@example.com", message: 123 })).toBe(false);
+    expect(isValidBody({ email: 123, message: "hello" })).toBe(false);
+    expect(isValidBody({ email: "user@example.com", message: 123 })).toBe(false);
   });
 
-  it("should reject whitespace-only subject or message", () => {
-    expect(isValidBody({ subject: "  ", email: "user@example.com", message: "hello" })).toBe(false);
+  it("should reject whitespace-only message", () => {
     expect(isValidBody({ subject: "hi", email: "user@example.com", message: "   " })).toBe(false);
   });
 
+  it("should allow whitespace-only or empty subject", () => {
+    expect(isValidBody({ email: "user@example.com", message: "hello", subject: "  " })).toBe(true);
+    expect(isValidBody({ email: "user@example.com", message: "hello", subject: "" })).toBe(true);
+  });
+
   it("should reject subject over 200 chars", () => {
-    expect(isValidBody({ subject: "x".repeat(201), email: "user@example.com", message: "hello" })).toBe(false);
-    expect(isValidBody({ subject: "x".repeat(200), email: "user@example.com", message: "hello"})).toBe(true);
+    expect(isValidBody({ email: "user@example.com", message: "hello", subject: "x".repeat(201) })).toBe(false);
+    expect(isValidBody({ email: "user@example.com", message: "hello", subject: "x".repeat(200) })).toBe(true);
   });
 
   it("should reject message over 2000 chars", () => {
@@ -94,6 +102,16 @@ describe("isValidBody",() => {
 
   it("should reject invalid emails", () => {
     expect(isValidBody({ subject: "hello", email: "invalid", message: "nah..." })).toBe(false);
+  });
+
+  it("should accept valid optional name", () => {
+    expect(isValidBody({ email: "user@example.com", message: "hello", name: "Test" })).toBe(true);
+    expect(isValidBody({ email: "user@example.com", message: "hello", name: "" })).toBe(true);
+  });
+
+  it("should reject name over 100 chars", () => {
+    expect(isValidBody({ email: "user@example.com", message: "hello", name: "a".repeat(101) })).toBe(false);
+    expect(isValidBody({ email: "user@example.com", message: "hello", name: "a".repeat(100) })).toBe(true);
   });
 });
   

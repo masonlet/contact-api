@@ -22,13 +22,14 @@ Deployable Resend contact form API
 
 ## Usage
 ```js
-await fetch('https://your-deployment.vercel.app/api/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+await fetch("https://your-deployment.vercel.app/api/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-        subject: 'Hello',
-        email: 'sender@example.com',
-        message: 'Your message here'
+        email: "sender@example.com",  // required
+        message: "Your message here", // required
+        subject: "Hello",             // optional
+        name: "Your name"             // optional
     })
 });
 ```

@@ -1,5 +1,6 @@
 export interface ContactBody {
-  subject: string;
   email: string;
   message: string;
+  subject?: string;
+  name?: string;
 }
