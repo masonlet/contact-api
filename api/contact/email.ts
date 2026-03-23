@@ -17,13 +17,19 @@ export function getEmailConfig(config: Config): EmailConfig | null {
   return { client: config.resend, from: config.fromEmail, to: config.toEmails };
 }
 
-export async function sendEmail(config: EmailConfig, body: ContactBody): Promise<void> {
+export async function sendEmail(
+  config: EmailConfig, 
+  body: ContactBody
+): Promise<void> {
+  const subjectLine = body.subject?.replace(/[\r\n]+/g, " ").trim() ?? "New message";
+  const fromLine = body.name ? `${body.name} <${body.email}>` : body.email;
+
   const result = await config.client.emails.send({
     from: config.from,
     to: config.to,
     replyTo: body.email,
-    subject: `Contact form: ${body.subject.replace(/[\r\n]+/g, " ").trim()}`,
-    text: `From: ${body.email}\n\n${body.message.trim()}`
+    subject: `Contact form: ${subjectLine}`,
+    text: `From: ${fromLine}\n\n${body.message.trim()}`
   });
 
   if (result.error) {
