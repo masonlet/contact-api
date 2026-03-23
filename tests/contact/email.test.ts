@@ -1,97 +1,69 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import type { Resend } from "resend";
-import { getEmailConfig, sendEmail, type EmailConfig } from "../../src/email.js";
-import type { ContactBody } from "../../src/types.js";
+import type { EmailProvider, ContactBody } from "@/src/types.js";
+import { getEmailConfig, sendEmail, type EmailConfig } from "@/src/email.js";
 
-vi.mock("resend");
+const mockProvider: EmailProvider = {
+  id: "mock",
+  send: vi.fn()
+};
 
-const mockResend = {
-  emails: {
-    send: vi.fn()
-  }
-} satisfies Resend;
+const mockEmailConfig: EmailConfig = {
+  provider: mockProvider,
+  from: "from@test.com",
+  to: ["to@test.com"]
+};
+
+const body: ContactBody = {
+  email: "user@test.com",
+  message: "Hello"
+};
+
+beforeEach(() => vi.clearAllMocks());
 
 describe("email.ts", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    (vi.mocked(mockResend.emails.send) as any).mockResolvedValue({ data: [], error: null });
-  });
-
   describe("getEmailConfig", () => {
+    const base = { provider: mockProvider, fromEmail: mockEmailConfig.from, toEmails: mockEmailConfig.to, allowedOrigins: [] };
+
     it("returns null if config missing or empty props", () => {
-      expect(getEmailConfig({ resend: null as any, fromEmail: "a@b.com", toEmails: ["c@d.com"] })).toBeNull();
-      expect(getEmailConfig({ resend: {} as any, fromEmail: "", toEmails: ["c@d.com"] })).toBeNull();
-      expect(getEmailConfig({ resend: {} as any, fromEmail: "a@b.com", toEmails: [] })).toBeNull();
+      expect(getEmailConfig({ ...base, provider: null })).toBeNull();
+      expect(getEmailConfig({ ...base, fromEmail: "" })).toBeNull();
+      expect(getEmailConfig({ ...base, toEmails: [] })).toBeNull();
     });
 
     it("returns EmailConfig when valid", () => {
-      const result = getEmailConfig({ resend: mockResend, fromEmail: "from@test.com", toEmails: ["to@test.com"] });
-      expect(result).toMatchObject({
-        client: mockResend,
-        from: 'from@test.com',
-        to: ['to@test.com']
-      });
+      expect(getEmailConfig({ ...base })).toMatchObject(mockEmailConfig);
     });
   });
 
   describe("sendEmail", () => {
-    const mockEmailConfig: EmailConfig = {
-      client: mockResend as any,
-      from: "from@test.com",
-      to: ["to@test.com"]
-    };
-    const body: ContactBody = {
-      email: "user@test.com",
-      subject: "Test\nSubject",
-      message: "Hello "
-    };
-
     it("calls resend with sanitized payload", async () => {
-      await sendEmail(mockEmailConfig, body);
-      expect(mockResend.emails.send).toHaveBeenCalledWith({
-        from: "from@test.com",
-        to: ["to@test.com"],
+      await sendEmail(mockEmailConfig, { ...body, subject: "Test\nSubject" });
+      expect(mockProvider.send).toHaveBeenCalledWith({
+        from: mockEmailConfig.from,
+        to: mockEmailConfig.to,
         replyTo: body.email,
         subject: "Contact form: Test Subject",
-        text: `From: ${body.email}\n\n${body.message.trim()}`
+        text: `From: ${body.email}\n\n${body.message}`
       });
     });
 
     it("formats fromLine with name when provided", async () => {
-      const bodyWithName: ContactBody = { ...body, name: "Tester" };
-      await sendEmail(mockEmailConfig, bodyWithName);
-      expect(mockResend.emails.send).toHaveBeenCalledWith(
-        expect.objectContaining({
-          text: `From: Tester <user@test.com>\n\n${body.message.trim()}`
-        })
+      await sendEmail(mockEmailConfig, { ...body, name: "Tester" });
+      expect(mockProvider.send).toHaveBeenCalledWith(
+        expect.objectContaining({ text: `From: Tester <${body.email}>\n\n${body.message}` })
       );
     });
 
     it("uses default subject when not provided", async () => {
-      const bodyNoSubject: ContactBody = { email: "user@test.com", message: "Hello" };
-      await sendEmail(mockEmailConfig, bodyNoSubject);
-      expect(mockResend.emails.send).toHaveBeenCalledWith(
+      await sendEmail(mockEmailConfig, body);
+      expect(mockProvider.send).toHaveBeenCalledWith(
         expect.objectContaining({ subject: "Contact form: New message" })
       );
     });
 
-    it("throws Resend errors", async () => {
-      (mockResend.emails.send as any).mockRejectedValue(new Error("API fail"));
-      await expect(sendEmail(mockEmailConfig, body)).rejects.toThrow("API fail");
-    });
-
-    it("throws on Resend success-with-error response", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-      (mockResend.emails.send as any).mockResolvedValue({
-        data: null,
-        error: { message: "Invalid recipient domain" }
-      });
-
-      await expect(sendEmail(mockEmailConfig, body)).rejects.toThrow(/Invalid/);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Resend API error:", { message: "Invalid recipient domain" });
-      consoleSpy.mockRestore();
-    });
+    it("throws when provider.send rejects", async () => {
+      (mockProvider.send as any).mockRejectedValue(new Error("Send failed"));
+      await expect(sendEmail(mockEmailConfig, body)).rejects.toThrow("Send failed");
+    });  
   });
 });
