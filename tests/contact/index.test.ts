@@ -2,15 +2,15 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 vi.mock("@vercel/firewall", () => ({ checkRateLimit: vi.fn() }));
-vi.mock("@/api/contact/cors.js", () => ({ setCorsHeaders: vi.fn() }));
-vi.mock("@/api/contact/validation.js", () => ({ isValidBody: vi.fn() }));
-vi.mock("@/api/contact/email.js", () => ({ getEmailConfig: vi.fn(), sendEmail: vi.fn() }));
-vi.mock("@/api/contact/config.js", () => ({ config: { allowedOrigins: ["https://example.com"] } }));
+vi.mock("@/src/cors.js", () => ({ setCorsHeaders: vi.fn() }));
+vi.mock("@/src/validation.js", () => ({ isValidBody: vi.fn() }));
+vi.mock("@/src/email.js", () => ({ getEmailConfig: vi.fn(), sendEmail: vi.fn() }));
+vi.mock("@/src/config.js", () => ({ config: { allowedOrigins: ["https://example.com"] } }));
 
 import { checkRateLimit } from "@vercel/firewall";
-import { setCorsHeaders } from "@/api/contact/cors.js";
-import { isValidBody } from "@/api/contact/validation.js";
-import { getEmailConfig, sendEmail } from "@/api/contact/email.js";
+import { setCorsHeaders } from "@/src/cors.js";
+import { isValidBody } from "@/src/validation.js";
+import { getEmailConfig, sendEmail } from "@/src/email.js";
 import handler from "@/api/contact/index.js";
 
 const makeReq = (overrides: Partial<VercelRequest> = {}): VercelRequest => ({

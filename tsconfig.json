@@ -49,7 +49,8 @@
     }
   },
   "include": [
-    "./api/**/*.ts"
+    "./api/**/*.ts",
+    "./src/**/*.ts"
   ],
   "exclude": [
     "dist/",

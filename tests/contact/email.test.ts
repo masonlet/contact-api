@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import type { Resend } from "resend";
-import { getEmailConfig, sendEmail, type EmailConfig } from "@/api/contact/email.js";
-import type { ContactBody } from "@/api/contact/types.js";
+import { getEmailConfig, sendEmail, type EmailConfig } from "@/src/email.js";
+import type { ContactBody } from "@/src/types.js";
 
 vi.mock("resend");
 
