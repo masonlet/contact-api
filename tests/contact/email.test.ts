@@ -20,18 +20,17 @@ describe("email.ts", () => {
 
   describe("getEmailConfig", () => {
     it("returns null if config missing or empty props", () => {
-      expect(getEmailConfig({ resend: null as any, fromEmail: "a@b.com", toEmail: "c@d.com" })).toBeNull();
-      expect(getEmailConfig({ resend: {} as any, fromEmail: "", toEmail: "c@d.com" })).toBeNull();
-      expect(getEmailConfig({ resend: {} as any, fromEmail: "a@b.com", toEmail: "" })).toBeNull();
-      expect(getEmailConfig({ resend: {} as any, fromEmail: "a@b.com", toEmail: [] })).toBeNull();
+      expect(getEmailConfig({ resend: null as any, fromEmail: "a@b.com", toEmails: ["c@d.com"] })).toBeNull();
+      expect(getEmailConfig({ resend: {} as any, fromEmail: "", toEmails: ["c@d.com"] })).toBeNull();
+      expect(getEmailConfig({ resend: {} as any, fromEmail: "a@b.com", toEmails: [] })).toBeNull();
     });
 
     it("returns EmailConfig when valid", () => {
-      const result = getEmailConfig({ resend: mockResend, fromEmail: "from@test.com", toEmail: "to@test.com" });
+      const result = getEmailConfig({ resend: mockResend, fromEmail: "from@test.com", toEmails: ["to@test.com"] });
       expect(result).toMatchObject({
         client: mockResend,
         from: 'from@test.com',
-        to: 'to@test.com'
+        to: ['to@test.com']
       });
     });
   });

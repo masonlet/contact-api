@@ -5,16 +5,16 @@ import type { Config } from "./config.js";
 export interface EmailConfig {
   client: Resend;
   from: string;
-  to: string | string[];
+  to: string[];
 }
 
 export function getEmailConfig(config: Config): EmailConfig | null {
   if (
     !config.resend || 
     !config.fromEmail?.trim() || 
-    !config.toEmail?.length 
+    !config.toEmails?.length 
   ) return null;
-  return { client: config.resend, from: config.fromEmail, to: config.toEmail };
+  return { client: config.resend, from: config.fromEmail, to: config.toEmails };
 }
 
 export async function sendEmail(config: EmailConfig, body: ContactBody): Promise<void> {
