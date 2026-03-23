@@ -13,12 +13,6 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
-  const { rateLimited } = await checkRateLimit("contact-form-limit");
-  if (rateLimited) {
-    res.status(429).json({ error: "Too many requests. Please try again later." });
-    return;
-  }
-
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
@@ -29,20 +23,26 @@ export default async (req: VercelRequest, res: VercelResponse): Promise<void> =>
     return;
   }
 
-  const emailConfig = getEmailConfig(config);
-  if (!emailConfig) {
-    res.status(503).json({ error: "Service temporarily unavailable" });
-    return;
-  }
-
   if(req.body["fax_number"]) {
     console.warn("Honeypot triggered:", req.headers["x-forwarded-for"] ?? "unknown");
     res.json({ success: true, message: "Message sent successfully" });
     return;
   }
 
+  const emailConfig = getEmailConfig(config);
+  if (!emailConfig) {
+    res.status(503).json({ error: "Service temporarily unavailable" });
+    return;
+  }
+
   if (!isValidBody(req.body)) {
     res.status(400).json({ error: "Invalid or missing fields" });
+    return;
+  }
+
+  const { rateLimited } = await checkRateLimit("contact-form-limit");
+  if (rateLimited) {
+    res.status(429).json({ error: "Too many requests. Please try again later." });
     return;
   }
 
