@@ -1,14 +1,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { checkRateLimit } from "@vercel/firewall"
-import { setCorsHeaders, isOriginAllowed } from "./cors.js";
+import { setCorsHeaders } from "./cors.js";
 import { isValidBody } from "./validation.js";
 import { getEmailConfig, sendEmail } from "./email.js";
 import { config } from "./config.js";
 
 export default async (req: VercelRequest, res: VercelResponse): Promise<void> => {
-  if (setCorsHeaders(req, res, config.allowedOrigins)) return;
-
-  if (!isOriginAllowed(req.headers["origin"], config.allowedOrigins)) {
+  const cors = setCorsHeaders(req, res, config.allowedOrigins);
+  if (cors === "preflight") return;
+  if (cors === "forbidden") {
     res.status(403).json({ error: "Forbidden" });
     return;
   }

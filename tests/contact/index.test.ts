@@ -2,13 +2,13 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 vi.mock("@vercel/firewall", () => ({ checkRateLimit: vi.fn() }));
-vi.mock("@/api/contact/cors.js", () => ({ setCorsHeaders: vi.fn(), isOriginAllowed: vi.fn() }));
+vi.mock("@/api/contact/cors.js", () => ({ setCorsHeaders: vi.fn() }));
 vi.mock("@/api/contact/validation.js", () => ({ isValidBody: vi.fn() }));
 vi.mock("@/api/contact/email.js", () => ({ getEmailConfig: vi.fn(), sendEmail: vi.fn() }));
 vi.mock("@/api/contact/config.js", () => ({ config: { allowedOrigins: ["https://example.com"] } }));
 
 import { checkRateLimit } from "@vercel/firewall";
-import { setCorsHeaders, isOriginAllowed } from "@/api/contact/cors.js";
+import { setCorsHeaders } from "@/api/contact/cors.js";
 import { isValidBody } from "@/api/contact/validation.js";
 import { getEmailConfig, sendEmail } from "@/api/contact/email.js";
 import handler from "@/api/contact/index.js";
@@ -32,16 +32,15 @@ const makeRes = (): VercelResponse => {
 describe("contact handler (index.ts)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(setCorsHeaders).mockReturnValue(false);
-    vi.mocked(isOriginAllowed).mockReturnValue(true);
+    vi.mocked(setCorsHeaders).mockReturnValue("ok");
     vi.mocked(checkRateLimit).mockResolvedValue({ rateLimited: false } as any);
-    vi.mocked(getEmailConfig).mockReturnValue({ client: {} as any, from: "from@test.com", to: "to@test.com" });
+    vi.mocked(getEmailConfig).mockReturnValue({ client: {} as any, from: "from@test.com", to: ["to@test.com"] });
     vi.mocked(isValidBody).mockReturnValue(true);
     vi.mocked(sendEmail).mockResolvedValue(undefined);
   });
 
-  it("returns early when setCorsHeaders returns true (OPTIONS preflight)", async () => {
-    vi.mocked(setCorsHeaders).mockReturnValue(true);
+  it("returns early when setCorsHeaders returns 'preflight'", async () => {
+    vi.mocked(setCorsHeaders).mockReturnValue("preflight");
     const req = makeReq({ method: "OPTIONS" });
     const res = makeRes();
     await handler(req, res);
@@ -49,8 +48,8 @@ describe("contact handler (index.ts)", () => {
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
-  it("returns 403 when origin is not allowed", async () => {
-    vi.mocked(isOriginAllowed).mockReturnValue(false);
+  it("returns 403 when setCorsHeaders returns 'forbidden'", async () => {
+    vi.mocked(setCorsHeaders).mockReturnValue("forbidden");
     const res = makeRes();
     await handler(makeReq(), res);
     expect(res.status).toHaveBeenCalledWith(403);
@@ -58,7 +57,6 @@ describe("contact handler (index.ts)", () => {
   });
 
   it("returns 429 when rate limited", async () => {
-    vi.mocked(isOriginAllowed).mockReturnValue(true);
     vi.mocked(checkRateLimit).mockResolvedValue({ rateLimited: true } as any);
     const res = makeRes();
     await handler(makeReq(), res);
