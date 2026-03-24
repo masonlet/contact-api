@@ -1,5 +1,5 @@
 # Contact API
-Deployable Resend contact form API
+Deployable **multi-provider** contact form API
 
 [![Tests](https://github.com/masonlet/contact-api/actions/workflows/ci.yml/badge.svg)](https://github.com/masonlet/contact-api/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -10,10 +10,15 @@ Deployable Resend contact form API
 - [Usage](#usage)
 - [Response](#response)
 - [Deployment & Configuration](#deployment--configuration)
+  - [Prerequisites](#prerequisites)
+  - [Configure `.env`](#2-configure-env)
+  - [Deploying](#deploying)
+  - [Local Development](#local-development)
 - [License](#license)
 
 ## Features
 - Single `POST /api/contact` endpoint - drop into any project.
+- Multi-provider support: Resend, Nodemailer (SMTP).
 - CORS support via `ALLOWED_ORIGINS` env var.
 - Input validation with descriptive error responses.
 - Rate limiting via Vercel WAF to prevent spam and abuse.
@@ -29,7 +34,8 @@ await fetch("https://your-deployment.vercel.app/api/contact", {
         email: "sender@example.com",  // required
         message: "Your message here", // required
         subject: "Hello",             // optional
-        name: "Your name"             // optional
+        name: "Your name",            // optional
+        fax_number: ""                // optional; must be empty
     })
 });
 ```
@@ -50,8 +56,10 @@ await fetch("https://your-deployment.vercel.app/api/contact", {
 
 ### Prerequisites
 - Node.js 20+
-- Resend API key & verified domain
 - Vercel
+- An email provider
+    - **Resend:** API key and verified domain
+    - **Nodemailer:** Valid SMTP settings (host, port, user, pass).
 
 ### 1. Clone & Install
 ```bash
@@ -65,19 +73,20 @@ Copy `.env.example` to `.env` and fill Environment Variables. All values are **r
 
 | Variable          | Description |
 | ----------------- | ----------- |
-| `EMAIL_PROVIDER`  | `resend`    |
-| `RESEND_API_KEY`  | Your Resend API key (using `resend` provider) |
 | `FROM_EMAIL`      | Sender address |
 | `TO_EMAIL`        | Recipients (comma-separated) |
-| `ALLOWED_ORIGINS` | CORS origins (comma-separated) empty blocks all requests. |
+| `ALLOWED_ORIGINS` | CORS origins (comma-separated); empty blocks all requests. |
+| `EMAIL_PROVIDER`  | `resend` or `nodemailer`. |
+| `RESEND_API_KEY`  | Your Resend API key (using `resend` provider) |
+| `SMTP_CONFIG`     | JSON string of Nodemailer config (using `nodemailer` provider) |
 
-### Deploy
+### Deploying
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=EMAIL_PROVIDER,RESEND_API_KEY,FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS&envDescription[EMAIL_PROVIDER]=resend&envDescription[RESEND_API_KEY]=Your%20Resend%20API%20key&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins)
+#### Deploy with Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS,EMAIL_PROVIDER,RESEND_API_KEY&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins&envDescription[EMAIL_PROVIDER]=resend&envDescription[RESEND_API_KEY]=Your%20Resend%20API%20key)
 
-```bash
-vercel deploy
-```
+#### Deploy with Nodemailer
+[![Deploy with Nodemailer](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS,EMAIL_PROVIDER,SMTP_CONFIG&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins&envDescription[EMAIL_PROVIDER]=nodemailer&envDescription[SMTP_CONFIG]=JSON%20string%20of%20SMTP%20settings)
 
 ### Local Development
 ```bash
