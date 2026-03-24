@@ -43,10 +43,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "checkJs": false,
-    "noEmit": true,
-    "paths": {
-      "@/*": ["./*"]
-    }
+    "noEmit": true
   },
   "include": [
     "./api/**/*.ts",
