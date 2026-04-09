@@ -65,14 +65,15 @@ Copy `.env.example` to `.env` and fill Environment Variables. All values are **r
 
 | Variable          | Description |
 | ----------------- | ----------- |
-| `RESEND_API_KEY`  | Your Resend API key |
-| `FROM_EMAIL`      | Sender address (must be a verified Resend domain) |
-| `TO_EMAIL`        | Delivery address |
-| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins— empty blocks all requests. |
+| `EMAIL_PROVIDER`  | `resend`    |
+| `RESEND_API_KEY`  | Your Resend API key (using `resend` provider) |
+| `FROM_EMAIL`      | Sender address |
+| `TO_EMAIL`        | Recipients (comma-separated) |
+| `ALLOWED_ORIGINS` | CORS origins (comma-separated) empty blocks all requests. |
 
 ### Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=RESEND_API_KEY,FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS&envDescription[RESEND_API_KEY]=Your%20Resend%20API%20key&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/masonlet/contact-api&env=EMAIL_PROVIDER,RESEND_API_KEY,FROM_EMAIL,TO_EMAIL,ALLOWED_ORIGINS&envDescription[EMAIL_PROVIDER]=resend&envDescription[RESEND_API_KEY]=Your%20Resend%20API%20key&envDescription[FROM_EMAIL]=Sender%20address%20(must%20be%20a%20verified%20Resend%20domain)&envDescription[TO_EMAIL]=Delivery%20address&envDescription[ALLOWED_ORIGINS]=Comma-separated%20list%20of%20allowed%20CORS%20origins)
 
 ```bash
 vercel deploy
