@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Resend } from "resend";
-import { ResendProvider } from "@/src/providers/resend.js";
-import type { EmailPayload } from "@/src/types.js";
+import { ResendProvider } from "../../../src/providers/resend.js";
+import type { EmailPayload } from "../../../src/types.js";
 
 vi.mock("resend", () => {
   const mockSend = vi.fn();

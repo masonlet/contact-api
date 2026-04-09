@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import type { EmailProvider, ContactBody } from "@/src/types.js";
-import { getEmailConfig, sendEmail, type EmailConfig } from "@/src/email.js";
+import type { EmailProvider, ContactBody } from "../../src/types.js";
+import { getEmailConfig, sendEmail, type EmailConfig } from "../../src/email.js";
 
 const mockProvider: EmailProvider = {
   id: "mock",
